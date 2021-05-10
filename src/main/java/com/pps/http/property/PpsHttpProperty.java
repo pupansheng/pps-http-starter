@@ -21,7 +21,7 @@ public class PpsHttpProperty {
 
 
     /**
-     * 是否开启自动配置 开启了就还自动开启http1_1配置
+     * 是否开启自动配置
      */
     private boolean enable;
 

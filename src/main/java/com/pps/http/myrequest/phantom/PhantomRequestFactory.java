@@ -37,6 +37,9 @@ public class PhantomRequestFactory implements ClientHttpRequestFactory, Disposab
     private DesiredCapabilities dcaps;
     private PhantomDriverHander phantomDriverHander;
     private static final ThreadLocal<PhantomJSDriver> PHANTOM_JS_DRIVER_THREAD_LOCAL=new ThreadLocal<>();
+    private static final ThreadLocal<Integer> PHANTOM_JS_DRIVER_COUNT=ThreadLocal.withInitial(()->{
+        return new Integer(0);
+    });
     public PhantomRequestFactory(DesiredCapabilities dcaps,PhantomDriverHander phantomDriverHander,String path, int bufferSize) {
         if(path==null||"".equals(path)){
             throw new RuntimeException("phantomjs path 不合法！："+path);
@@ -93,6 +96,8 @@ public class PhantomRequestFactory implements ClientHttpRequestFactory, Disposab
         log.info("线程：{}  准备取走驱动---------：",Thread.currentThread().getId());
         PhantomJSDriver phantomJSDriver = PHANTOM_JS_DRIVER_THREAD_LOCAL.get();
         if(phantomJSDriver!=null){
+            Integer count = PHANTOM_JS_DRIVER_COUNT.get();
+            PHANTOM_JS_DRIVER_COUNT.set(count+1);
             log.info("线程：{}  已从THREAD_LOCAL 取走驱动：",Thread.currentThread().getId(), phantomJSDriver);
             return phantomJSDriver;
         }
@@ -122,10 +127,15 @@ public class PhantomRequestFactory implements ClientHttpRequestFactory, Disposab
 
         for (int i = 0; i <bufferSize ; i++) {
             if(phantomJSDrivers[i]==driver && driverStatus[i].get()){
-                semaphore.release();
-                driverStatus[i].set(false);
-                PHANTOM_JS_DRIVER_THREAD_LOCAL.remove();
-                log.info("线程：{}  归还驱动：",Thread.currentThread().getId(), driver);
+                Integer count = PHANTOM_JS_DRIVER_COUNT.get();
+                if(count==0) {
+                    semaphore.release();
+                    driverStatus[i].set(false);
+                    PHANTOM_JS_DRIVER_THREAD_LOCAL.remove();
+                    log.info("线程：{}  归还驱动：", Thread.currentThread().getId(), driver);
+                }else {
+                    PHANTOM_JS_DRIVER_COUNT.set(count-1);
+                }
             }
         }
 

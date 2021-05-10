@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="issues">
+    <option name="index">
+      <map>
+        <entry key="/Dummy.txt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="/fragment.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../demo-mybatis-plug/src/main/java/com/example/demo/entity/TestServiceImpl.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../demo-mybatis-plug/src/main/java/com/example/demo/mapper/UserMapper.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../demo-mybatis-plug/src/test/java/com/example/demo/DemoMybatisPlugApplicationTests.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../opra-adjcdr/opra-adjcdr-server/src/main/java/com/acca/opra/adjcdr/bo/JobWarnBo.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../opra-adjcdr/opra-adjcdr-server/src/main/java/com/acca/opra/adjcdr/constants/AdjConstant.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../opra-adjcdr/opra-adjcdr-server/src/main/java/com/acca/opra/adjcdr/controller/AdJCdrController.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../opra-adjcdr/opra-adjcdr-server/src/main/java/com/acca/opra/adjcdr/dao/AdjCdrResultDao.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../opra-adjcdr/opra-adjcdr-server/src/main/java/com/acca/opra/adjcdr/job/AdjWarnJob.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../opra-adjcdr/opra-adjcdr-server/src/main/resources/mapper/adjCdrResultDao.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/PpsHttpUtil.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/PpsHttpUtilExcute.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/PpsHttpUtilForSpring.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/configure/PpsHttp.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/configure/PpsHttpAutoConfigure.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/custom/PhantomDriverCustomHander.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/custom/PhantomDriverHander.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/custom/PhantomjsCustom.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/driverhander/PhantomDriverHander.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/executor/PpsHttpExcutor.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/executor/PpsHttpUtilExcute.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/myrequest/MyNetty4ClientHttpRequestFactory.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/myrequest/netty/MyNetty4ClientHttpRequestFactory.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/myrequest/phantom/KillHandler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/myrequest/phantom/PhantomClientHttpRequest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/myrequest/phantom/PhantomClientHttpResponse.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/myrequest/phantom/PhantomRequestFactory.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/property/PpsHttpProperty.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/com/pps/http/util/PpsAsyncUtil.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/resources/META-INF/spring.factories">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="C:/my-java-project/fastdfs-client-java/src/main/java/custom/PhantomjsCustom.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="C:/my-java-project/java8_lean/java8_lean/src/com/JavaTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="C:/my-java-project/java8_lean/java8_lean/src/com/KillHandler.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="C:/my-java-project/java8_lean/java8_lean/src/com/thread/threadpool/ThreadPoolTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="C:/my-java-project/pps-and-lyt-love-rom-back/src/main/java/com/pps/back/frame/pupansheng/custom/controller/TestControoller.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="C:/my-java-project/pps-and-lyt-love-rom-back/src/main/java/com/pps/back/frame/pupansheng/custom/pachong/_aikekeResouceNew.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

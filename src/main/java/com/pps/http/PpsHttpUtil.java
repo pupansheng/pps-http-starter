@@ -5,7 +5,11 @@ import com.pps.http.executor.PpsHttpExcutor;
 import com.pps.http.myrequest.netty.MyNetty4ClientHttpRequestFactory;
 import com.pps.http.myrequest.phantom.PhantomRequestFactory;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 import org.springframework.web.client.RestTemplate;
+
+import javax.net.ssl.SSLException;
 
 /**
  * @author pps
@@ -23,14 +27,25 @@ public class PpsHttpUtil implements PpsHttp {
     private static RestTemplate restTemplateForPhantomjs=new RestTemplate();
 
     private static String PHAMTOM_JS_PATH;
-
+    private static Object lock=new Object();
+    private static PhantomRequestFactory phantomRequestFactory;
     public static void setPhamtomJsPath(String path){
       PHAMTOM_JS_PATH=path;
     }
 
     static {
-        restTemplateForNetty1_0.setRequestFactory(new MyNetty4ClientHttpRequestFactory(HttpVersion.HTTP_1_0));
-        restTemplateForNetty1_1.setRequestFactory(new MyNetty4ClientHttpRequestFactory(HttpVersion.HTTP_1_1));
+        SslContext sslContext=null;
+        try {
+            sslContext= SslContextBuilder.forClient().build();
+        } catch (SSLException e) {
+            e.printStackTrace();
+        }
+        MyNetty4ClientHttpRequestFactory myNetty4ClientHttpRequestFactory = new MyNetty4ClientHttpRequestFactory(HttpVersion.HTTP_1_0);
+        myNetty4ClientHttpRequestFactory.setSslContext(sslContext);
+        restTemplateForNetty1_0.setRequestFactory(myNetty4ClientHttpRequestFactory);
+        MyNetty4ClientHttpRequestFactory myNetty4ClientHttpRequestFactory1 = new MyNetty4ClientHttpRequestFactory(HttpVersion.HTTP_1_1);
+        myNetty4ClientHttpRequestFactory1.setSslContext(sslContext);
+        restTemplateForNetty1_1.setRequestFactory(myNetty4ClientHttpRequestFactory1);
     }
 
     /**
@@ -87,7 +102,14 @@ public class PpsHttpUtil implements PpsHttp {
      * @return
      */
     public static PpsHttpExcutor createPhantojsClient(boolean async){
-        restTemplateForPhantomjs.setRequestFactory(new PhantomRequestFactory(PHAMTOM_JS_PATH,1));
+        if(phantomRequestFactory==null){
+            synchronized (lock){
+                if(phantomRequestFactory==null){
+                    phantomRequestFactory=new PhantomRequestFactory(PHAMTOM_JS_PATH,1);
+                }
+            }
+        }
+        restTemplateForPhantomjs.setRequestFactory(phantomRequestFactory);
         return new PpsHttpExcutor(async, restTemplateForPhantomjs,null);
     }
 

@@ -66,7 +66,7 @@ public class MyNetty4ClientHttpRequestFactory implements ClientHttpRequestFactor
     @Nullable
     private volatile Bootstrap bootstrap;
 
-    private int ioWorkerCount;
+    private int ioWorkerCount=1;
 
 
     /**

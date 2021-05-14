@@ -101,4 +101,11 @@ public class PhantomDriverUtil {
         return null;
     }
 
+    /**
+     * 获得网站的地址
+     * @return
+     */
+    public static String getHostAddressScript(){
+        return "var hostAddress=window.location.protocol+'//'+window.location.host+window.location.port;";
+    }
 }

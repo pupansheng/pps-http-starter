@@ -22,21 +22,15 @@ public class PpsHttpUtil implements PpsHttp {
     //无界浏览器
     private static RestTemplate restTemplateForPhantomjs=new RestTemplate();
 
-    private static final ThreadLocal<String> PHAMTOM_JS_PATH=ThreadLocal.withInitial(()->{
-        String winLocation="D:\\dev_softwares\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe";;
-        String linLocation="/usr/bin/phantomjs";
-        String os = System.getProperty("os.name");
-        if(os.toLowerCase().startsWith("win")) {
-           return  winLocation;
-        }else {
-          return  linLocation;
-        }
-    });
+    private static String PHAMTOM_JS_PATH;
+
+    public static void setPhamtomJsPath(String path){
+      PHAMTOM_JS_PATH=path;
+    }
 
     static {
         restTemplateForNetty1_0.setRequestFactory(new MyNetty4ClientHttpRequestFactory(HttpVersion.HTTP_1_0));
         restTemplateForNetty1_1.setRequestFactory(new MyNetty4ClientHttpRequestFactory(HttpVersion.HTTP_1_1));
-        restTemplateForPhantomjs.setRequestFactory(new PhantomRequestFactory(PHAMTOM_JS_PATH.get(),2));
     }
 
     /**
@@ -93,7 +87,8 @@ public class PpsHttpUtil implements PpsHttp {
      * @return
      */
     public static PpsHttpExcutor createPhantojsClient(boolean async){
-            return new PpsHttpExcutor(async, restTemplateForPhantomjs,null);
+        restTemplateForPhantomjs.setRequestFactory(new PhantomRequestFactory(PHAMTOM_JS_PATH,1));
+        return new PpsHttpExcutor(async, restTemplateForPhantomjs,null);
     }
 
 

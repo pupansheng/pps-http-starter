@@ -75,5 +75,8 @@ public class MyNetty4ClientHttpResponse extends AbstractClientHttpResponse {
         this.nettyResponse.release();
         this.context.close();
     }
+    public void  addRef(int i){
+        this.nettyResponse.retain(i);
+    }
 
 }

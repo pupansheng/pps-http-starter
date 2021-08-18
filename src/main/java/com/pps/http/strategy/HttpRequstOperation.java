@@ -1,7 +1,6 @@
 package com.pps.http.strategy;
 
 import io.netty.buffer.ByteBufInputStream;
-import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
@@ -60,6 +59,21 @@ public interface HttpRequstOperation  {
         }
         return query;
     }
+    default byte [] toByteArray(InputStream inputStream){
+        byte [] bytes=null;
+        try {
+            int available = inputStream.available();
+            bytes=new byte[available];
+
+            inputStream.read(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+
+        return bytes;
+    }
     /**压缩处理**/
     default byte [] encode(ClientHttpResponse response) throws IOException {
 
@@ -71,7 +85,7 @@ public interface HttpRequstOperation  {
                 bytes=new byte[available];
                 body1.read(bytes);
             }else {
-                bytes = IOUtils.toByteArray(body);
+                bytes = toByteArray(body);
             }
             List<String> list = response.getHeaders().get("Content-Encoding");
             if(list==null||list.size()==0){

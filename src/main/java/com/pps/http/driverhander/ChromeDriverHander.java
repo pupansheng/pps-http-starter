@@ -4,26 +4,26 @@ package com.pps.http.driverhander;/*
  */
 
 
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-
-import java.util.function.Consumer;
 
 /**
  * @author Pu PanSheng, 2021/5/8
  * @version OPRA v1.0
  */
-public interface PhantomDriverHander {
+public interface ChromeDriverHander {
 
 
     /**
      * 浏览器自定义
      * @param dcaps
      */
-    void  customPhantomJsDriver(DesiredCapabilities dcaps);
+    void  customPhantomJsDriver(ChromeOptions dcaps);
 
     /**
      * 驱动自定义
      */
-    void  driverCustom(PhantomJSDriver[] phantomJSDrivers);
+    void  driverCustom(ChromeDriver[] chromeDrivers);
 }

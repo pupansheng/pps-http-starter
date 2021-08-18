@@ -38,24 +38,48 @@ public class PpsHttpProperty {
      */
     private boolean enableforPhantom=false;
     /**
+     * 是否开启chrome自动配置
+     */
+    private boolean enableforChrome=false;
+
+    /**
+     * 是否开启心跳
+     */
+    private boolean enableHeat=false;
+
+    /**
+     * 间隔 单位分钟
+     */
+    private int interval=10;
+    /**
      * phantomJs 驱动位置
      */
     private String path;
 
     /**
-     * phantomjs 等待时间设置 单位秒
+     * 谷歌驱动位置
      */
-    private int implicitlyWait=10;
+    private String chromePath;
 
     /**
      * paantomJs 驱动缓存大小
      */
     private  int buffSize=2;
+
+    /**
+     * chrome 驱动缓存大小
+     */
+    private  int chromeBuffSize=2;
     /**
      *
-     * http默认连接时间 默认无限 仅对普通请求管用  phatomjs无效
+     * http默认连接时间 默认无限 仅对普通请求管用  phatomjs chrome无效
      */
     private int connectTime=-1;
+    /**
+     * http响应大小限制
+     */
+    private int maxResponseSize=10*1024*1024;
+
     /**
      * http read时间
      */

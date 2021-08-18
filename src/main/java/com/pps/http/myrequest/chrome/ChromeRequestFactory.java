@@ -2,26 +2,28 @@
  * Copyright (c) ACCA Corp.
  * All Rights Reserved.
  */
-package com.pps.http.myrequest.phantom;
+package com.pps.http.myrequest.chrome;
 
+import com.pps.http.driverhander.ChromeDriverHander;
 import com.pps.http.driverhander.PhantomDriverHander;
+import com.pps.http.myrequest.phantom.PhantomClientHttpRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 
 /**
  * @author Pu PanSheng, 2021/4/4
@@ -29,77 +31,83 @@ import java.util.function.Consumer;
  */
 
 @Slf4j
-public class PhantomRequestFactory implements ClientHttpRequestFactory, DisposableBean {
+public class ChromeRequestFactory implements ClientHttpRequestFactory, DisposableBean {
     private String path;
     private  int bufferSize;
-    private PhantomJSDriver [] phantomJSDrivers;
+    private ChromeDriver [] chromeDrivers;
     private AtomicBoolean [] driverStatus;
     private Semaphore semaphore;
-    private DesiredCapabilities dcaps;
-    private PhantomDriverHander phantomDriverHander;
-    private static final ThreadLocal<PhantomJSDriver> PHANTOM_JS_DRIVER_THREAD_LOCAL=new ThreadLocal<>();
-    private static final ThreadLocal<Integer> PHANTOM_JS_DRIVER_COUNT=ThreadLocal.withInitial(()->{
+    private ChromeOptions options;
+    private ChromeDriverHander chromeDriverHander;
+    private static final ThreadLocal<ChromeDriver> CHROME_DRIVER_THREAD_LOCAL=new ThreadLocal<>();
+    private static final ThreadLocal<Integer> CHROME_DRIVER_COUNT=ThreadLocal.withInitial(()->{
         return new Integer(0);
     });
-    public PhantomRequestFactory(DesiredCapabilities dcaps,PhantomDriverHander phantomDriverHander,String path, int bufferSize) {
+    public ChromeRequestFactory( ChromeOptions options, ChromeDriverHander phantomDriverHander, String path, int bufferSize) {
         if(path==null||"".equals(path)){
-            throw new RuntimeException("phantomjs path 不合法！："+path);
+            throw new RuntimeException("chrome path 不合法！："+path);
         }
-        this.dcaps=dcaps;
-        this.phantomDriverHander=phantomDriverHander;
+        this.options=options;
+        this.chromeDriverHander=phantomDriverHander;
         this.path=path;
         this.bufferSize=bufferSize;
-        this.phantomJSDrivers=new PhantomJSDriver[bufferSize];
+        this.chromeDrivers=new ChromeDriver[bufferSize];
         this.semaphore=new Semaphore(bufferSize);
         this.driverStatus=new AtomicBoolean[bufferSize];
         initDriver();
     }
-    public PhantomRequestFactory(String path, int bufferSize) {
+    public ChromeRequestFactory( ChromeOptions options,String path, int bufferSize) {
+        if(path==null||"".equals(path)){
+            throw new RuntimeException("chrome path 不合法！："+path);
+        }
+        this.options=options;
+        this.path=path;
+        this.bufferSize=bufferSize;
+        this.chromeDrivers=new ChromeDriver[bufferSize];
+        this.semaphore=new Semaphore(bufferSize);
+        this.driverStatus=new AtomicBoolean[bufferSize];
+        initDriver();
+    }
+    public ChromeRequestFactory(String path, int bufferSize) {
         if(path==null||"".equals(path)){
             throw new RuntimeException("phantomjs path 不合法！："+path);
         }
-        DesiredCapabilities dcaps = new DesiredCapabilities();
-
-        dcaps.setCapability("acceptSslCerts", true);
-        //截屏支持
-        dcaps.setCapability("takesScreenshot", true);
-        //css搜索支持
-        dcaps.setCapability("cssSelectorsEnabled", true);
-        //js支持
-        dcaps.setJavascriptEnabled(true);
-
-        this.dcaps=dcaps;
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless"); // 禁用阻止弹出窗口
+        options.addArguments("--disable-dev-shm-usage "); // 启动无沙盒模式运行
+        options.addArguments("--disable-gpu");
+        options.addArguments("--no-sandbox");
+        this.options=options;
         this.path=path;
         this.bufferSize=bufferSize;
-        this.phantomJSDrivers=new PhantomJSDriver[bufferSize];
+        this.chromeDrivers=new ChromeDriver[bufferSize];
         this.semaphore=new Semaphore(bufferSize);
         this.driverStatus=new AtomicBoolean[bufferSize];
         initDriver();
     }
     private void initDriver(){
-        dcaps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY,path);
+        System.setProperty("webdriver.chrome.driver",path);
         for (int i = 0; i <bufferSize ; i++) {
-            //驱动支持
-            //创建无界面浏览器对象
-            PhantomJSDriver driver= new PhantomJSDriver(dcaps);
+            ChromeDriver driver= new ChromeDriver(options);
             driver.manage().window().maximize();
             driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-            phantomJSDrivers[i]=driver;
+            chromeDrivers[i]=driver;
             driverStatus[i]=new AtomicBoolean(false);
         }
-        if(phantomDriverHander!=null){
-            phantomDriverHander.driverCustom(phantomJSDrivers);
+        if(chromeDriverHander!=null){
+            chromeDriverHander.driverCustom(chromeDrivers);
         }
     }
 
+
     public void check() throws InterruptedException {
 
-        for (int i = 0; i < phantomJSDrivers.length; i++) {
+        for (int i = 0; i < chromeDrivers.length; i++) {
 
             if(!driverStatus[i].get()){
                 semaphore.acquire();
                 driverStatus[i].getAndSet(true);
-                PhantomJSDriver chromeDriver = phantomJSDrivers[i];
+                ChromeDriver chromeDriver = chromeDrivers[i];
                 boolean isTrue=true;
                 try {
                     chromeDriver.get("https://www.baidu.com");
@@ -108,13 +116,13 @@ public class PhantomRequestFactory implements ClientHttpRequestFactory, Disposab
                 }
                 if(!isTrue){
                     try {
-                        phantomJSDrivers[i].close();
-                        phantomJSDrivers[i].quit();
+                        chromeDrivers[i].close();
+                        chromeDrivers[i].quit();
                     } catch (Exception e) {
 
                     }
-                    log.info("driver :{} 失效 开始重新生成驱动---------------",phantomJSDrivers[i]);
-                    phantomJSDrivers[i]=new PhantomJSDriver(dcaps);
+                    log.info("driver :{} 失效 开始重新生成驱动---------------",chromeDrivers[i]);
+                    chromeDrivers[i]=new ChromeDriver(options);
                 }
                 driverStatus[i].getAndSet(false);
                 semaphore.release();
@@ -123,12 +131,13 @@ public class PhantomRequestFactory implements ClientHttpRequestFactory, Disposab
 
     }
 
-    public PhantomJSDriver getDriver(){
+
+    public ChromeDriver getDriver(){
         log.info("线程：{}  准备取走驱动---------：",Thread.currentThread().getId());
-        PhantomJSDriver phantomJSDriver = PHANTOM_JS_DRIVER_THREAD_LOCAL.get();
+        ChromeDriver phantomJSDriver = CHROME_DRIVER_THREAD_LOCAL.get();
         if(phantomJSDriver!=null){
-            Integer count = PHANTOM_JS_DRIVER_COUNT.get();
-            PHANTOM_JS_DRIVER_COUNT.set(count+1);
+            Integer count = CHROME_DRIVER_COUNT.get();
+            CHROME_DRIVER_COUNT.set(count+1);
             log.info("线程：{}  已从THREAD_LOCAL 取走驱动：",Thread.currentThread().getId(), phantomJSDriver);
             return phantomJSDriver;
         }
@@ -142,10 +151,10 @@ public class PhantomRequestFactory implements ClientHttpRequestFactory, Disposab
         for (int i = 0; i <bufferSize ; i++) {
 
             if(!driverStatus[i].get()){
-                driverStatus[i].set(true);
-                PHANTOM_JS_DRIVER_THREAD_LOCAL.set(phantomJSDrivers[i]);
-                log.info("线程：{}  以从缓存池中 取走驱动：",Thread.currentThread().getId(), phantomJSDrivers[i]);
-                return phantomJSDrivers[i];
+                driverStatus[i].getAndSet(true);
+                CHROME_DRIVER_THREAD_LOCAL.set(chromeDrivers[i]);
+                log.info("线程：{}  以从缓存池中 取走驱动：",Thread.currentThread().getId(), chromeDrivers[i]);
+                return chromeDrivers[i];
             }
 
         }
@@ -154,18 +163,18 @@ public class PhantomRequestFactory implements ClientHttpRequestFactory, Disposab
     }
 
 
-    public void returnDriver(PhantomJSDriver driver){
+    public void returnDriver(RemoteWebDriver driver){
 
         for (int i = 0; i <bufferSize ; i++) {
-            if(phantomJSDrivers[i]==driver && driverStatus[i].get()){
-                Integer count = PHANTOM_JS_DRIVER_COUNT.get();
+            if(chromeDrivers[i]==driver && driverStatus[i].get()){
+                Integer count = CHROME_DRIVER_COUNT.get();
                 if(count==0) {
                     semaphore.release();
-                    driverStatus[i].set(false);
-                    PHANTOM_JS_DRIVER_THREAD_LOCAL.remove();
+                    driverStatus[i].getAndSet(false);
+                    CHROME_DRIVER_THREAD_LOCAL.remove();
                     log.info("线程：{}  归还驱动：", Thread.currentThread().getId(), driver);
                 }else {
-                    PHANTOM_JS_DRIVER_COUNT.set(count-1);
+                    CHROME_DRIVER_COUNT.set(count-1);
                 }
             }
         }
@@ -177,25 +186,25 @@ public class PhantomRequestFactory implements ClientHttpRequestFactory, Disposab
 
     @Override
     public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
-        PhantomClientHttpRequest phantomClientHttpRequest = new PhantomClientHttpRequest(uri, httpMethod,this);
+        ChromeClientHttpRequest phantomClientHttpRequest = new ChromeClientHttpRequest(uri, httpMethod,this);
         return phantomClientHttpRequest;
     }
 
     @Override
     public void destroy() throws Exception {
-        log.info("释放Phantomjs Driver 资源-------------");
+        log.info("释放Chrome Driver 资源-------------");
         for (int i = 0; i < bufferSize; i++) {
             try {
-                phantomJSDrivers[i].close();
+                chromeDrivers[i].close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
             try {
-                phantomJSDrivers[i].quit();
+                chromeDrivers[i].quit();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        log.info("释放Phantomjs Driver 资源结束-----------");
+        log.info("释放Chrome Driver 资源结束-----------");
     }
 }

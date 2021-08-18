@@ -4,6 +4,8 @@
  */
 package com.pps.http.util;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -131,6 +133,46 @@ public class RegexUtil {
             list.add(group);
         }
         return list;
+
+    }
+
+    public static String findHost(String url){
+
+        try {
+            URI uri = new URI(url);
+            String scheme = uri.getScheme();
+            String host1 = uri.getHost();
+            return  host1;
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static String findScheme(String url){
+
+        try {
+            URI uri = new URI(url);
+            String scheme = uri.getScheme();
+            String host1 = uri.getHost();
+            return  scheme;
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    public static String findUrlPrefx(String url){
+
+        try {
+            URI uri = new URI(url);
+            String scheme = uri.getScheme();
+            String host1 = uri.getHost();
+            return  scheme+"://"+host1;
+        } catch (URISyntaxException e) {
+               throw new RuntimeException(e);
+        }
 
     }
 }

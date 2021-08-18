@@ -4,6 +4,8 @@ package com.pps.http.executor;
 import com.pps.http.PpsHttp;
 import com.pps.http.PpsHttpUtil;
 import com.pps.http.PpsHttpUtilForSpring;
+import com.pps.http.myrequest.chrome.ChromeClientHttpResponse;
+import com.pps.http.myrequest.netty.MyNetty4ClientHttpResponse;
 import com.pps.http.myrequest.phantom.PhantomClientHttpRequest;
 import com.pps.http.myrequest.phantom.PhantomClientHttpResponse;
 import com.pps.http.strategy.HttpRequstOperation;
@@ -483,7 +485,7 @@ public class PpsHttpExcutor {
                     @Override
                     public void doWithRequest(ClientHttpRequest request) throws IOException {
 
-                        if(!(request instanceof PhantomClientHttpRequest)) {
+                        if(!(request instanceof PhantomClientHttpRequest)||!(request instanceof ChromeClientHttpResponse)) {
                             request.getHeaders().addAll(headers);
                             finalClientHttpRequestConsumer.accept(request);
                         }
@@ -511,14 +513,23 @@ public class PpsHttpExcutor {
                                     if (ppsHttp == null) {
                                         PpsHttpUtil.createSyncClient().setAutoTransforString(false).setUrl(newUrl).get((r, s) -> {
                                             t.set(r);
+                                            if(r instanceof MyNetty4ClientHttpResponse){
+                                                MyNetty4ClientHttpResponse myNetty4ClientHttpResponse = (MyNetty4ClientHttpResponse) r;
+                                                myNetty4ClientHttpResponse.addRef(1);
+                                            }
                                         });
                                     } else {
                                         PpsHttpUtilForSpring ppsHttp = (PpsHttpUtilForSpring) PpsHttpExcutor.this.ppsHttp;
                                         ppsHttp.createSyncClient().setAutoTransforString(false).setUrl(newUrl).get((r, s) -> {
                                             t.set(r);
+                                            if(r instanceof MyNetty4ClientHttpResponse){
+                                                MyNetty4ClientHttpResponse myNetty4ClientHttpResponse = (MyNetty4ClientHttpResponse) r;
+                                                myNetty4ClientHttpResponse.addRef(1);
+                                            }
                                         });
                                     }
-                                    return t.get();
+                                    ClientHttpResponse clientHttpResponse = t.get();
+                                    return clientHttpResponse;
                                 }
                             }
                             return response;
@@ -528,6 +539,10 @@ public class PpsHttpExcutor {
                             if(response instanceof PhantomClientHttpResponse){
                                 PhantomClientHttpResponse phantomJs = (PhantomClientHttpResponse) response;
                                 phantomJs.returnDiver();
+                            }
+                            if(response instanceof ChromeClientHttpResponse){
+                                ChromeClientHttpResponse chromeClientHttpResponse = (ChromeClientHttpResponse) response;
+                                chromeClientHttpResponse.returnDiver();
                             }
                             throw new RuntimeException(e);
                         }
@@ -550,6 +565,10 @@ public class PpsHttpExcutor {
                         PhantomClientHttpResponse phantomJs = (PhantomClientHttpResponse) response;
                         phantomJs.returnDiver();
                     }
+                    if(response instanceof ChromeClientHttpResponse){
+                        ChromeClientHttpResponse chromeClientHttpResponse = (ChromeClientHttpResponse) response;
+                        chromeClientHttpResponse.returnDiver();
+                    }
                 }
 
 
@@ -562,7 +581,7 @@ public class PpsHttpExcutor {
             try (ClientHttpResponse response = (ClientHttpResponse) restTemplate.execute(httpUrl, httpMethod, new RequestCallback() {
                 @Override
                 public void doWithRequest(ClientHttpRequest request) throws IOException {
-                    if (!(request instanceof PhantomClientHttpRequest)) {
+                    if(!(request instanceof PhantomClientHttpRequest)||!(request instanceof ChromeClientHttpResponse)) {
                         request.getHeaders().addAll(headers);
                         finalClientHttpRequestConsumer.accept(request);
                     }
@@ -588,14 +607,27 @@ public class PpsHttpExcutor {
                                 if (ppsHttp == null) {
                                     PpsHttpUtil.createSyncClient().setAutoTransforString(false).setUrl(newUrl).get((r, s) -> {
                                         t.set(r);
+                                        if(r instanceof MyNetty4ClientHttpResponse){
+                                            MyNetty4ClientHttpResponse myNetty4ClientHttpResponse = (MyNetty4ClientHttpResponse) r;
+                                            myNetty4ClientHttpResponse.addRef(1);
+                                        }
                                     });
+
                                 } else {
                                     PpsHttpUtilForSpring ppsHttp = (PpsHttpUtilForSpring) PpsHttpExcutor.this.ppsHttp;
                                     ppsHttp.createSyncClient().setAutoTransforString(false).setUrl(newUrl).get((r, s) -> {
                                         t.set(r);
+                                        if(r instanceof MyNetty4ClientHttpResponse){
+                                            MyNetty4ClientHttpResponse myNetty4ClientHttpResponse = (MyNetty4ClientHttpResponse) r;
+                                            myNetty4ClientHttpResponse.addRef(1);
+                                        }
                                     });
                                 }
-                                return t.get();
+
+                                ClientHttpResponse clientHttpResponse = t.get();
+
+                                return clientHttpResponse;
+
                             }
                         }
                         return response;
@@ -604,6 +636,10 @@ public class PpsHttpExcutor {
                         if (response instanceof PhantomClientHttpResponse) {
                             PhantomClientHttpResponse phantomJs = (PhantomClientHttpResponse) response;
                             phantomJs.returnDiver();
+                        }
+                        if(response instanceof ChromeClientHttpResponse){
+                            ChromeClientHttpResponse chromeClientHttpResponse = (ChromeClientHttpResponse) response;
+                            chromeClientHttpResponse.returnDiver();
                         }
 
                         throw new RuntimeException(e);
@@ -628,6 +664,10 @@ public class PpsHttpExcutor {
                         PhantomClientHttpResponse phantomJs = (PhantomClientHttpResponse) response;
                         phantomJs.returnDiver();
                     }
+                    if(response instanceof ChromeClientHttpResponse){
+                        ChromeClientHttpResponse chromeClientHttpResponse = (ChromeClientHttpResponse) response;
+                        chromeClientHttpResponse.returnDiver();
+                    }
 
                 }
             }
@@ -646,8 +686,10 @@ public class PpsHttpExcutor {
             String pageSource = driver.getPageSource();
             return  pageSource;
         }
+        if(response instanceof ChromeClientHttpResponse){
+          return   ((ChromeClientHttpResponse) response).getHtml();
+        }
 
-        MediaType contentType = response.getHeaders().getContentType();
         byte [] bytes= null;
         try {
             bytes =responseTobytesStrategy.apply(response);
@@ -655,6 +697,7 @@ public class PpsHttpExcutor {
             e.printStackTrace();
             throw new RuntimeException("response 转换为String失败：");
         }
+        MediaType contentType = response.getHeaders().getContentType();
         Charset charset = contentType.getCharset();
         if(charset==null){
             charset=Charset.forName("utf-8");
